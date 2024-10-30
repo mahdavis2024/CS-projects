@@ -12,5 +12,9 @@ opened = opening(unzipped)
 
 read_write(opened)
 
+show(opened)
+
+showxl()
+
 # i made it much harder and longer than necassery! 
 # but i wanted to make a reusable module and have costumized exceptions.

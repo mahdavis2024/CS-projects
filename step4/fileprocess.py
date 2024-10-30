@@ -1,5 +1,7 @@
 import urllib.request
-import zipfile
+import re 
+from datetime import datetime, timedelta
+from zipfile import ZipFile
 from pathlib import Path
 
 
@@ -40,8 +42,8 @@ def unzip(filename= 'HISTDATA_COM_XLSX_EURUSD_M12018.zip'):
     """unzipping a local file and extracting."""
     dir_path = Path(filename).parent
     try:
-        z = zipfile.ZipFile(filename)
-        z.extractall()
+        with ZipFile(filename) as z:
+            z.extractall()
     except Exception as er:
         raise FileExtractionError(f'An error occured while extrating the file: {er}')
     else:
@@ -84,3 +86,55 @@ def read_write(files_in_folder):
         raise FileProcessingError(f'An error occured while processing files: {er}')
     else:
         print('****Files copied successfully!')
+
+def show(files_in_folder):
+    """showing the content of excel file. 
+    Because the xlsx in a binary format, it is not easily readable with just buil_in Python functions.
+    The xlsx format is essentially a ZIP file, containing XML files that represent the workbooks, sheets, and information.
+    Therefore, in this task, we treat the .XLSX as ZIP archive and manually extract the XML data. 
+    """
+    try:
+        for file in files_in_folder:
+            fp = Path(file)
+            if fp.suffix == '.txt':
+                with open(file, 'r') as text:
+                    for line in text.readlines()[:20]:
+                        print(line.strip())
+            elif fp.suffix == '.xlsx':
+                with ZipFile(file, 'r') as excel:
+                    excel.extractall()
+
+    except Exception as er:
+        raise FileProcessingError(f'An error occured while displaying the {file} content: {er}')
+    else:
+        print('****File content dispalyed successfully!')
+
+def find_floats(string):
+    # Use regular expression to find all float numbers in the string
+    float_pattern = re.compile(r'\d+\.\d+')
+    float_numbers = float_pattern.findall(string)
+    
+    return float_numbers
+
+def float_to_datetime(num):
+    time = datetime(1899, 12, 30)
+    delta = timedelta(num)
+    return time+delta
+
+def showxl(address = Path.cwd()):
+    '''displaying the content of the main sheet of the excel file as strings in the output.'''
+    try:
+        print("____________________________________________________________________")
+        print("         A          |    B    |    C    |    D    |    E    |   F   ")
+        print("--------------------------------------------------------------------")
+        xmlpath = Path.joinpath(address , 'xl','worksheets', 'sheet1.xml')
+        with open(xmlpath, 'r') as sheet:
+                for line in sheet.readlines()[2:50]:
+                    nums = find_floats(line)
+                    if len(nums)>0:
+                        dt = float_to_datetime(float(nums[0]))
+                        print(dt, "|{:>9}|{:>9}|{:>9}|{:>9}|{:>5}".format(nums[1],nums[2],nums[3],nums[4],nums[5]))
+    except Exception as er:
+        raise FileProcessingError(f'An error occured while displaying the {xmlpath.name} content: {er}')
+    else:
+        print('****File content dispalyed successfully!')                    
