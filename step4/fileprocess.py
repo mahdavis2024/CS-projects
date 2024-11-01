@@ -125,7 +125,7 @@ def showxl(address = Path.cwd()):
     '''displaying the content of the main sheet of the excel file as strings in the output.'''
     try:
         print("____________________________________________________________________")
-        print("         A          |    B    |    C    |    D    |    E    |   F   ")
+        print("   Date & Time      |  Open   |  High   |   Low   |  Close  |   F   ")
         print("--------------------------------------------------------------------")
         xmlpath = Path.joinpath(address , 'xl','worksheets', 'sheet1.xml')
         with open(xmlpath, 'r') as sheet:
