@@ -22,4 +22,3 @@ print(EURUSD.tail())
 
 # Save the dataframe to the same Excel file
 EURUSD.to_excel(file_path, index=False, header=True, sheet_name='2018') 
-
